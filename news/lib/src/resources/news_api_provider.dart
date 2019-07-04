@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' show Client;
-import 'package:news/src/resources/news_provider.dart';
 import '../models/item_model.dart';
-
+import 'news_source.dart';
 
 
 class NewsApiProvider implements NewsSource {
