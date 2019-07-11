@@ -17,18 +17,18 @@ class ItemModel {
 
   ItemModel.fromJson(Map<String, dynamic> json)
     : id = json['id'],
-      deleted = json['deleted'],
+      deleted = json['deleted'] ?? false,
       type = json['type'],
       by = json['by'],
       time = json['time'],
-      text = json['text'],
-      dead = json['dead'],
+      text = json['text'] ?? '',
+      dead = json['dead'] ?? false,
       parent = json['parent'],
-      kids = json['kids'],
+      kids = json['kids'] ?? [],
       url = json['url'],
       score = json['score'],
       title = json['title'],
-      descendants = json['descendants'];
+      descendants = json['descendants'] ?? 0;
 
   ItemModel.fromDb(Map<String, dynamic> json)
     : id = json['id'],
@@ -54,6 +54,7 @@ class ItemModel {
       'text': text,
       'url': url,
       'title': title,
+      'score': score,
       'descendants': descendants,
       'dead': dead ? 1 : 0,
       'deleted': deleted ? 1 : 0,

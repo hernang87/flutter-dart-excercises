@@ -20,7 +20,7 @@ class Repository implements NewsSource {
   Future<List<int>> fetchTopIds() async {
     for(NewsSource source in sources) {
       var topIds = await source.fetchTopIds();
-
+      
       if (topIds != null) return topIds;
     }
 
@@ -29,7 +29,7 @@ class Repository implements NewsSource {
 
   Future<ItemModel> fetchItem(int id) async {
     ItemModel item;
-    NewsSource source;
+    var source;
 
     for(source in sources) {
       item = await source.fetchItem(id);
@@ -38,9 +38,17 @@ class Repository implements NewsSource {
     }
 
     for(NewsCache cache in caches) {
-      cache.addItem(item);
+      if (cache != source) {
+        cache.addItem(item);
+      }
     }
 
     return item;
+  }
+
+  Future<void> clearCaches() async {
+    for(NewsCache cache in caches) {
+      await cache.clear();
+    }
   }
 }

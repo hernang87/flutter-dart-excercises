@@ -17,11 +17,11 @@ class NewsDbProvider implements NewsSource, NewsCache {
 
   void init() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    final path = join(documentsDirectory.path, 'items.db');
+    final path = join(documentsDirectory.path, 'items2.db');
 
     _db = await openDatabase(
       path,
-      version: 1,
+      version: 1,      
       onCreate: (Database newDb, int version) {
         newDb.execute(
           '''
@@ -37,7 +37,8 @@ class NewsDbProvider implements NewsSource, NewsCache {
             url TEXT,
             score INTEGER,
             title INTEGER,
-            descendants INTEGER
+            descendants INTEGER,
+            time INTEGER
           )
           '''
         );
@@ -65,8 +66,13 @@ class NewsDbProvider implements NewsSource, NewsCache {
   Future<int> addItem(ItemModel item) {
     return _db.insert(
       'items', 
-      item.toMap()
+      item.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.ignore
     );
+  }
+
+  Future<int> clear() {
+    return _db.delete('items');
   }
 
   @override
