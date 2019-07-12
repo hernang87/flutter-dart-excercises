@@ -1,43 +1,35 @@
 import 'dart:async';
-import 'package:news/src/resources/news_cache.dart';
-
 import 'news_api_provider.dart';
 import 'news_db_provider.dart';
-import 'package:news/src/models/item_model.dart';
+import '../models/item_model.dart';
 
-import 'news_source.dart';
-
-class Repository implements NewsSource {
-  final List<NewsSource> sources = <NewsSource> [
+class Repository {
+  List<Source> sources = <Source>[
     newsDbProvider,
-    NewsApiProvider()
+    NewsApiProvider(),
   ];
-  
-  final List<NewsCache> caches = <NewsCache>[
-    newsDbProvider
+  List<Cache> caches = <Cache>[
+    newsDbProvider,
   ];
 
-  Future<List<int>> fetchTopIds() async {
-    for(NewsSource source in sources) {
-      var topIds = await source.fetchTopIds();
-      
-      if (topIds != null) return topIds;
-    }
-
-    return List<int>();
+  // Iterate over sources when dbprovider
+  // get fetchTopIds implemented
+  Future<List<int>> fetchTopIds() {
+    return sources[1].fetchTopIds();
   }
 
   Future<ItemModel> fetchItem(int id) async {
     ItemModel item;
     var source;
 
-    for(source in sources) {
+    for (source in sources) {
       item = await source.fetchItem(id);
-
-      if (item != null) break;
+      if (item != null) {
+        break;
+      }
     }
 
-    for(NewsCache cache in caches) {
+    for (var cache in caches) {
       if (cache != source) {
         cache.addItem(item);
       }
@@ -46,9 +38,19 @@ class Repository implements NewsSource {
     return item;
   }
 
-  Future<void> clearCaches() async {
-    for(NewsCache cache in caches) {
+  clearCache() async {
+    for (var cache in caches) {
       await cache.clear();
     }
   }
+}
+
+abstract class Source {
+  Future<List<int>> fetchTopIds();
+  Future<ItemModel> fetchItem(int id);
+}
+
+abstract class Cache {
+  Future<int> addItem(ItemModel item);
+  Future<int> clear();
 }

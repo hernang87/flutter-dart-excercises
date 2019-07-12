@@ -1,26 +1,24 @@
 import 'package:flutter/material.dart';
 
 class LoadingContainer extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(context) {
     return Column(
       children: [
         ListTile(
-          title: _buildGreyBox(),
-          subtitle: _buildGreyBox()          
+          title: buildContainer(),
+          subtitle: buildContainer(),
         ),
-        Divider(
-          height: 8.0,
-        )
-      ]);
+        Divider(height: 8.0),
+      ],
+    );
   }
 
-  Widget _buildGreyBox() {
+  Widget buildContainer() {
     return Container(
-      color: Colors.grey[300],
+      color: Colors.grey[200],
       height: 24.0,
       width: 150.0,
-      margin: EdgeInsets.only(bottom: 5.0, top: 5.0),
+      margin: EdgeInsets.only(top: 5.0, bottom: 5.0),
     );
   }
 }

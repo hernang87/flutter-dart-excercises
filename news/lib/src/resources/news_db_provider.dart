@@ -1,58 +1,58 @@
-import 'dart:async';
-import 'dart:io';
-import 'package:news/src/resources/news_cache.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:path/path.dart';
+import 'dart:async';
 import '../models/item_model.dart';
-import 'news_source.dart';
+import 'repository.dart';
 
-class NewsDbProvider implements NewsSource, NewsCache {  
-  Database _db;
+class NewsDbProvider implements Source, Cache {
+  Database db;
 
   NewsDbProvider() {
-    this.init();
+    init();
+  }
+
+  // Todo - store and fetch top ids
+  Future<List<int>> fetchTopIds() {
+    return null;
   }
 
   void init() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    final path = join(documentsDirectory.path, 'items2.db');
-
-    _db = await openDatabase(
+    final path = join(documentsDirectory.path, "items4.db");
+    db = await openDatabase(
       path,
-      version: 1,      
+      version: 1,
       onCreate: (Database newDb, int version) {
-        newDb.execute(
-          '''
-          CREATE TABLE items (
-            id INTEGER PRIMARY KEY,
-            type TEXT,
-            by TEXT,
-            text TEXT,
-            parent int,
-            kids BLOB,
-            dead INTEGER, 
-            deleted INTEGER,
-            url TEXT,
-            score INTEGER,
-            title INTEGER,
-            descendants INTEGER,
-            time INTEGER
-          )
-          '''
-        );
-      }
+        newDb.execute("""
+          CREATE TABLE Items
+            (
+              id INTEGER PRIMARY KEY,
+              type TEXT,
+              by TEXT,
+              time INTEGER,
+              text TEXT,
+              parent INTEGER,
+              kids BLOB,
+              dead INTEGER,
+              deleted INTEGER,
+              url TEXT,
+              score INTEGER,
+              title TEXT,
+              descendants INTEGER
+            )
+        """);
+      },
     );
   }
 
-  @override
   Future<ItemModel> fetchItem(int id) async {
-    final maps = await _db.query(
-      'items', 
+    final maps = await db.query(
+      "Items",
       columns: null,
-      where: 'id = ?',
-      whereArgs: [id]
+      where: "id = ?",
+      whereArgs: [id],
     );
 
     if (maps.length > 0) {
@@ -62,22 +62,16 @@ class NewsDbProvider implements NewsSource, NewsCache {
     return null;
   }
 
-  @override
   Future<int> addItem(ItemModel item) {
-    return _db.insert(
-      'items', 
+    return db.insert(
+      "Items",
       item.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.ignore
+      conflictAlgorithm: ConflictAlgorithm.ignore,
     );
   }
 
   Future<int> clear() {
-    return _db.delete('items');
-  }
-
-  @override
-  Future<List<int>> fetchTopIds() {
-    return null;
+    return db.delete("Items");
   }
 }
 
