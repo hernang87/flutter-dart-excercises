@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:news/src/blocs/comments_provider.dart';
 import 'package:news/src/blocs/stories_provider.dart';
 import 'package:news/src/screens/news_detail_screen.dart';
 import 'screens/news_list_screen.dart';
 
 class App extends StatelessWidget {
   Widget build(BuildContext context) {
-    return StoriesProvider(
-      child: MaterialApp(
-        title: 'News',            
-        onGenerateRoute: _routes         
+    return CommentsProvider(
+      child: StoriesProvider(
+        child: MaterialApp(
+          title: 'News',            
+          onGenerateRoute: _routes,          
+        )
       )
     );
   }
@@ -23,8 +26,12 @@ class App extends StatelessWidget {
     } else {
       return MaterialPageRoute(
         builder: (BuildContext context) {
-          int id = int.parse(settings.name.replaceFirst('/', ''));
-          return NewsDetailScreen(itemId: id);
+          final itemId = int.parse(settings.name.replaceFirst('/', ''));
+          
+          final commentsBloc = CommentsProvider.of(context); 
+          commentsBloc.fetchItemWithComments(itemId);
+
+          return NewsDetailScreen(itemId: itemId);
         }
       );
     }
